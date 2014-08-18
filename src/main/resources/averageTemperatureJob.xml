@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:hadoop="http://www.springframework.org/schema/hadoop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+            http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+            http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:property-placeholder properties-ref="myProperties"/>
+
+    <util:properties id="myProperties" >
+        <prop key="weather.input.path">/weather/in/</prop>
+        <prop key="weather.output.path">/weather/out/</prop>
+        <prop key="weather.export.path">/tmp/xd/output/weatherJob/</prop>
+        <prop key="weather.archive.path">/weather/archive/</prop>
+        <prop key="hd.fs">hdfs://localhost:8020</prop>
+    </util:properties>
+
+    <hadoop:configuration>
+        fs.defaultFS=${hd.fs}
+    </hadoop:configuration>
+
+    <hadoop:pig-factory />
+
+    <bean class="org.springframework.batch.core.scope.StepScope">
+        <property name="proxyTargetClass" value="true"/>
+    </bean>
+
+    <batch:job id="myJob">
+        <batch:step id="import" next="averageTemperature">
+            <batch:tasklet ref="importScriptTasklet"/>
+        </batch:step>
+
+        <batch:step id="averageTemperature" next="export">
+            <batch:tasklet ref="averageTemperaturePigTasklet"/>
+        </batch:step>
+
+        <batch:step id="export">
+            <batch:tasklet ref="exportScriptTasklet"/>
+        </batch:step>
+    </batch:job>
+
+    <hadoop:script-tasklet id="importScriptTasklet" script-ref="importScript" scope="step"/>
+
+    <hadoop:script id="importScript" language="groovy" scope="step">
+        <hadoop:property name="localSourceFile"
+                         value="${resources:file:///#{jobParameters['absoluteFilePath']}}"/>
+        <hadoop:property name="hdfsInputDir" value="${weather.input.path}"/>
+        <hadoop:property name="hdfsOutputDir" value="${weather.output.path}"/>
+
+        if (!fsh.test(hdfsInputDir)) {
+            fsh.mkdir(hdfsInputDir);
+        }
+
+        fsh.rm(hdfsInputDir + "*");
+        fsh.copyFromLocal(localSourceFile, hdfsInputDir);
+
+        if (fsh.test(hdfsOutputDir)) {
+            fsh.rmr(hdfsOutputDir)
+        }
+    </hadoop:script>
+
+    <hadoop:pig-tasklet id="averageTemperaturePigTasklet">
+        <hadoop:script location="averageTemperature.pig">
+            <hadoop:arguments>
+                inputfile=${weather.input.path}
+                outputpath=${weather.output.path}
+            </hadoop:arguments>
+        </hadoop:script>
+    </hadoop:pig-tasklet>
+
+
+    <hadoop:script-tasklet id="exportScriptTasklet" script-ref="exportScript" scope="step"/>
+
+    <hadoop:script id="exportScript" language="groovy" scope="step">
+        <hadoop:property name="hdfsOutputDir" value="${weather.output.path}"/>
+        <hadoop:property name="exportDir" value="${weather.export.path}"/>
+
+        import java.text.SimpleDateFormat
+
+        hdfsOutputDir = "/weather/out/"
+        currentDateTimeString = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(Calendar.instance.time)
+        filename = "averageTemperature_result_$currentDateTimeString" + ".txt";
+        targetFilePath = "$hdfsOutputDir$filename"
+
+        fsh.mv(hdfsOutputDir + "part-r-00000", targetFilePath)
+
+        fsh.copyToLocal(targetFilePath,exportDir)
+    </hadoop:script>
+
+</beans>
