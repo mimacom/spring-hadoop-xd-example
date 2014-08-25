@@ -75,31 +75,7 @@
             <artifactId>automaton</artifactId>
             <version>1.11-8</version>
         </dependency>
+
         <!-- pig runtime dependencies end -->
-
-        <!-- test dependencies start -->
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-hadoop</artifactId>
-            <version>2.0.2.RELEASE-hadoop24</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-hadoop-test</artifactId>
-            <version>2.0.2.RELEASE-hadoop24</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.4</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- test dependencies stop -->
-
     </dependencies>
 </project>
