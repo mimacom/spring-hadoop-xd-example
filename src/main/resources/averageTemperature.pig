@@ -2,8 +2,8 @@ month1 = LOAD '$inputfile' USING PigStorage(',') AS (wban:int, date:chararray, t
 
 transform = FOREACH month1 GENERATE date, SUBSTRING(date, 0, 4) as year, SUBSTRING(date, 4, 6) as month, SUBSTRING(date, 6, 8) as day, skyCondition, dryTemp;
 
-grouped = GROUP transform by (day);
+grouped = GROUP transform by (month, day);
 
 aggregated = FOREACH grouped GENERATE group, AVG(transform.dryTemp);
 
-dump grouped;
+STORE aggregated INTO '$outputpath' USING PigStorage(':');
