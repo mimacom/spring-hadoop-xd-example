@@ -10,7 +10,7 @@ The example looks as follows:
   * uploads the new file to HDFS
   * calculates the average temperature of clear days
   * stores the results back to the filesystem
-  * Another stream sends the results per email
+* Another stream sends the results per email
 
 Prerequisites
 -------------
@@ -36,12 +36,13 @@ Then a file lister which sends new files to the job.
 
 And finally, a mail stream will be created and deployed.
 
-    xd:>stream create mailstream --definition "file --dir=/tmp/xd/output/weatherJob/ --outputType=text/plain | mail --to='\"reciever@mimacom.com\"' --port=2525 --from='\"sender@mimacom.com\"' --subject='\"New average temperatures\"'"  --deploy
+    xd:>stream create mailstream --definition "file --dir=/tmp/xd/output/weatherJob/ --outputType=text/plain | mail --to='\"reciever@domain.com\"' --port=2525 --from='\"sender@domain.com\"' --subject='\"New average temperatures\"'"  --deploy
 
 
 Running the application
 -----------------------
 The only missing thing here are input files. Weather data can be downloaded at http://cdo.ncdc.noaa.gov/qclcd_ascii/.
 The example has been tested with the file `199607hourly.txt`.
+
     cp [filename] /tmp/xd/input/weatherFiles
 

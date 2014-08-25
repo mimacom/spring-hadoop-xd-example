@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:hadoop="http://www.springframework.org/schema/hadoop"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <hadoop:configuration id="hadoopConfiguration" resources="classpath:/core-site.xml">
+        <!--fs.default.name=${hd.fs}-->
+        <!--hadoop.tmp.dir=file://${hd.tmpdir}-->
+    </hadoop:configuration>
+
+    <context:property-placeholder properties-ref="myProperties"/>
+
+    <util:properties id="myProperties">
+        <prop key="weather.input.path">/weather/in/199607hourly_small.txt</prop>
+        <prop key="weather.output.path">/weather/out/</prop>
+    </util:properties>
+
+    <hadoop:pig-factory/>
+
+    <hadoop:pig-runner id="pigRunner">
+        <hadoop:script location="averageTemperature.pig">
+            <hadoop:arguments>
+                inputfile=${weather.input.path}
+                outputpath=${weather.output.path}
+            </hadoop:arguments>
+        </hadoop:script>
+    </hadoop:pig-runner>
+
+
+
+</beans>
