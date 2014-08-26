@@ -31,7 +31,7 @@
         <property name="proxyTargetClass" value="true"/>
     </bean>
 
-    <batch:job id="myJob">
+    <batch:job id="averageTemperatureJob">
         <batch:step id="import" next="averageTemperature">
             <batch:tasklet ref="importScriptTasklet"/>
         </batch:step>
