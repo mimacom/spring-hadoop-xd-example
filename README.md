@@ -28,15 +28,15 @@ Before running the example, Hadoop, XD and XD Shell must be running.
 
 First, the job will be created and deployed.
 
-    xd:>job create --name weatherJob --definition "averageTemperatureJob" --deploy
+    xd:> job create --name weatherJob --definition "averageTemperatureJob" --deploy
 
 Then a file lister which sends new files to the job.
 
-    xd:>stream create --name weatherFiles --definition "file --ref=true > queue:job:weatherJob"  --deploy
+    xd:> stream create --name weatherFiles --definition "file --ref=true > queue:job:weatherJob"  --deploy
 
 And finally, a mail stream will be created and deployed.
 
-    xd:>stream create mailstream --definition "file --dir=/tmp/xd/output/weatherJob/ --outputType=text/plain | mail --to='\"reciever@domain.com\"' --port=2525 --from='\"sender@domain.com\"' --subject='\"New average temperatures\"'"  --deploy
+    xd:> stream create mailstream --definition "file --dir=/tmp/xd/output/weatherJob/ --outputType=text/plain | mail --to='\"reciever@domain.com\"' --port=2525 --from='\"sender@domain.com\"' --subject='\"New average temperatures\"'"  --deploy
 
 
 Running the application
