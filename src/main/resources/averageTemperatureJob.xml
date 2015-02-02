@@ -31,6 +31,7 @@
         <property name="proxyTargetClass" value="true"/>
     </bean>
 
+    <!-- batch job -->
     <batch:job id="averageTemperatureJob">
         <batch:step id="import" next="averageTemperature">
             <batch:tasklet ref="importScriptTasklet"/>
@@ -45,8 +46,9 @@
         </batch:step>
     </batch:job>
 
-    <hadoop:script-tasklet id="importScriptTasklet" script-ref="importScript" scope="step"/>
 
+    <!-- import file from local file system to hdfs-->
+    <hadoop:script-tasklet id="importScriptTasklet" script-ref="importScript" scope="step"/>
     <hadoop:script id="importScript" language="groovy" scope="step">
         <hadoop:property name="localSourceFile"
                          value="${resources:file:///#{jobParameters['absoluteFilePath']}}"/>
@@ -65,6 +67,8 @@
         }
     </hadoop:script>
 
+
+    <!--configure pig script-->
     <hadoop:pig-tasklet id="averageTemperaturePigTasklet">
         <hadoop:script location="averageTemperature.pig">
             <hadoop:arguments>
@@ -75,8 +79,8 @@
     </hadoop:pig-tasklet>
 
 
+    <!--export file from hdfs to local file system-->
     <hadoop:script-tasklet id="exportScriptTasklet" script-ref="exportScript" scope="step"/>
-
     <hadoop:script id="exportScript" language="groovy" scope="step">
         <hadoop:property name="hdfsOutputDir" value="${weather.output.path}"/>
         <hadoop:property name="exportDir" value="${weather.export.path}"/>
