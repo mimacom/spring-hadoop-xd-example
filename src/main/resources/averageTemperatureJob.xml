@@ -19,10 +19,16 @@
         <prop key="weather.export.path">/tmp/xd/output/weatherJob/</prop>
         <prop key="weather.archive.path">/weather/archive/</prop>
         <prop key="hd.fs">hdfs://localhost:8020</prop>
+        <prop key="mapreduce.job.tracker">localhost:54311</prop>
+        <prop key="mapreduce.framework.name">yarn</prop>
+        <prop key="yarn.resourcemanager.address">localhost:8032</prop>
     </util:properties>
 
     <hadoop:configuration>
         fs.defaultFS=${hd.fs}
+        mapreduce.job.tracker=${mapreduce.job.tracker}
+        mapreduce.framework.name=${mapreduce.framework.name}
+        yarn.resourcemanager.address=${yarn.resourcemanager.address}
     </hadoop:configuration>
 
     <hadoop:pig-factory />
