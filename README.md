@@ -15,22 +15,25 @@ The example looks as follows:
 Prerequisites
 -------------
 * Apache Hadoop 2.x
-* Spring XD 1.0.0.RELEASE (with Hadoop configured)
+* Spring XD 1.1.0.RELEASE (with Hadoop configured)
 
 Installation
 ------------
-    mvn assembly:assembly
-    ./copyFiles.sh
+    mvn clean package
 
 Create and deploy jobs
 ----------------------
 Before running the example, Hadoop, XD and XD Shell must be running.
 
-First, the job will be created and deployed.
+First, the job module must be uploaded
+
+    xd:> module upload --file [path-to]/springhadoopxd-1.1.0.BUILD-SNAPSHOT.jar --averageTemperatureJob --type job
+
+Then, the job will be created and deployed.
 
     xd:> job create --name weatherJob --definition "averageTemperatureJob" --deploy
 
-Then a file lister which sends new files to the job.
+After that, a file lister is needed which sends new files to the job.
 
     xd:> stream create --name weatherFiles --definition "file --ref=true > queue:job:weatherJob"  --deploy
 
